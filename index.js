@@ -104,8 +104,6 @@
     timerId = setInterval(update, 1000/frames);
     update();
     
-    canvas.addEventListener( "click", handleClick );
-    
     function handleScene1( mouseX, mouseY ) {
          var button = buttons.filter( function( button ) {
              if( mouseX >=  button.x &&
@@ -188,5 +186,23 @@
         console.log( "Mouse X: " + mouseX );
         console.log( "Mouse Y: " + mouseY );        
     }
+    
+    function handleMouseMove( event ) {
+        var mouseX, mouseY;
+        
+        if( event.pageX || event.pageY === 0 ){
+             mouseX = event.pageX - this.offsetLeft;
+             mouseY = event.pageY - this.offsetTop;
+        } else if( event.offsetX || event.offsetY === 0 ) {
+             mouseX = event.offsetX;
+             mouseY = event.offsetY;
+        }
+        
+        console.log( "Mouse X: " + mouseX );
+        console.log( "Mouse Y: " + mouseY );
+    }
+    
+    canvas.addEventListener( "click", handleClick );
+    canvas.addEventListener( "mousemove", handleMouseMove );
     
      
