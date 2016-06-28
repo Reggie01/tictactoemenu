@@ -17,7 +17,6 @@
    arrowVisible = false,
              winner = false;
         
-    var timerId;
     var buttons = [
         {    
             name: "oicon",
@@ -39,8 +38,12 @@
            x: 0,
            y: 80
         }
-    ]
+    ];
     
+    
+    /*
+        Had issue with image flickering. Included this fix to resolve the issue from stack overflow.
+    */    
     function loadImages() {
         tictactoe.src = "Images/tictactoe.png";
         tictactoe.onload = function() {
@@ -68,12 +71,12 @@
     }
     
     function loadScene() { 
-            loadImages();    
+        loadImages();    
     }
     
     function clear() {
-         context.fillStyle = "white";
-         context.fillRect( 0, 0, width, height );
+         // context.fillStyle = "#fff";
+         context.clearRect( 0, 0, width, height );
     }
     
     function init() {       
@@ -112,6 +115,17 @@
         }
     }
     
+     window.requestAnimFrame = (function(callback) {
+        return window.requestAnimationFrame || 
+                   window.webkitRequestAnimationFrame || 
+                   window.mozRequestAnimationFrame || 
+                   window.oRequestAnimationFrame || 
+                   window.msRequestAnimationFrame ||
+                   function(callback) {
+                       window.setTimeout(callback, 1000 / 60);
+                   };
+      })();
+    
     function update() {
         
         if( scene === 1 ) {
@@ -121,12 +135,14 @@
         } else if( scene === 3 ) {
             createScene3();
         }
+        
+        requestAnimFrame( function() {
+            update();
+        } );
     }
     
     init();
     
-    var frames = 60;
-    timerId = setInterval(update, 1000/frames);
     update();
     
     function filterButton( mouseX, mouseY ) {
@@ -194,6 +210,8 @@
         
         if( button.length > 0 && button[0].name === "restart" ) {
              console.log( "restart button pressed..." );
+             arrowVisible = false;
+             scene = 1;
         }
     }
     
