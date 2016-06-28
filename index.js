@@ -12,7 +12,10 @@
          tictactoe = new Image(),
                xicon = new Image(),
              youwin = new Image(),
-             scene = 1;
+             scene = 1,
+ arrowDimensions = {x:"", y:""},
+   arrowVisible = false,
+             winner = false;
         
     var timerId;
     var buttons = [
@@ -61,11 +64,11 @@
         draw.src = "Images/draw.png";
         gameover.src = "Images/gameover.png";
         restart.src = "Images/playagain.png";
+        
     }
     
     function loadScene() { 
             loadImages();    
-           // loadArrow( 0, 170 );
     }
     
     function clear() {
@@ -73,13 +76,12 @@
          context.fillRect( 0, 0, width, height );
     }
     
-    function init() {
-         
+    function init() {       
          loadScene();
     }
     
     function createBoard() {
-        clear();
+       clear();
         
        context.beginPath();
        context.moveTo( width/3, 0 );
@@ -98,17 +100,32 @@
        
     }
     
+    function drawScene1() {
+        clear();
+        context.drawImage( tictactoe, 0, 0 );
+        context.drawImage( chooseone, 0, 80 );
+        context.drawImage( oicon, 60, 120 );
+        context.drawImage( xicon, 60, 160 );
+        console.log( arrowVisible );
+        if( arrowVisible ) {
+           context.drawImage( arrow, arrowDimensions.x, arrowDimensions.y ); 
+        }
+    }
+    
     function update() {
-        if( scene === 2 ){
+        
+        if( scene === 1 ) {
+           drawScene1();
+        } else if( scene === 2 ){
             createBoard();
         } else if( scene === 3 ) {
-            console.log( "Hello..." );
+            createScene3();
         }
     }
     
     init();
     
-    var frames = 30;
+    var frames = 60;
     timerId = setInterval(update, 1000/frames);
     update();
     
@@ -140,25 +157,31 @@
     }
     
     function createScene3() {
-        
-        var num = Math.random();
+               
+        if ( !winner ) {
+            winner = Math.random();
+        }
         
         clear();
         
         context.drawImage( gameover, 0, 0 );
-        if ( num > 0.66 ) {
+        if ( winner > 0.66 ) {
              context.drawImage( youwin, 0, 40 );
-             console.log( youwin );
-        } else if ( num > 0.33 ) {
+             // console.log( youwin );
+        } else if ( winner > 0.33 ) {
              context.drawImage( computerwins, 0, 40 );
-             console.log( computerwins );
+             // console.log( computerwins );
         } else {
              context.drawImage( draw, 0, 40 );
-             console.log( draw );
+             // console.log( draw );
         }
         
         context.drawImage( restart, 40, 80 );
-                            
+        
+        if( arrowVisible ) {
+           context.drawImage( arrow, arrowDimensions.x, arrowDimensions.y ); 
+        }
+                
     }
     
     function handleScene2( mouseX, mouseY ) {
@@ -167,8 +190,10 @@
     }
     
     function handleScene3( mouseX, mouseY ) {
-        if( mouseX > 0 && mouseX < 160 && mouseY > 80 && mouseY < 120 ) {
-            
+        var button = filterButton( mouseX, mouseY );
+        
+        if( button.length > 0 && button[0].name === "restart" ) {
+             console.log( "restart button pressed..." );
         }
     }
     
@@ -196,12 +221,10 @@
         console.log( "Mouse Y: " + mouseY );        
     }
     
-    function loadArrow( x, y ) {
-        console.log( "loading arrow" );
-        arrow.onload = function() {
-            console.log( "arrow loaded" );
-            context.drawImage( arrow, x, y );
-        }
+    function setArrowDimensions( mouseX, mouseY ) {
+        arrowVisible = true;
+        arrowDimensions.x = mouseX;
+        arrowDimensions.y = mouseY;
     }
     
     function handleMouseMoveScene1( mouseX, mouseY ) {
@@ -209,13 +232,20 @@
          
          if( button.length > 0 ) {
             if( button[0].name === "oicon" ) {
-                context.drawImage( arrow, 0, 130 );
-                console.log( "oicon button" );
+                setArrowDimensions( 0, 130 );
+                // console.log( "oicon button" );
             } else if( button[0].name === "xicon" ){
-                context.drawImage( arrow, 0, 170 );
-                console.log( "xicon button" );
-            } 
+                setArrowDimensions( 0, 170 );
+                // console.log( "xicon button" );
+            }  else {
+                arrowVisible = false; 
+            }
+         } else {
+            arrowVisible = false;
          }
+         
+         console.log( "Mouse X: " + mouseX );
+         console.log( "Mouse Y: " + mouseY ); 
     }
     
     function handleMouseMoveScene3( mouseX, mouseY ) {
@@ -224,8 +254,13 @@
          
          if( button.length > 0 ) {
              if( button[0].name === "restart" ){
+                 setArrowDimensions( 0, 90 );
                  console.log( "restart button" );
+             } else {
+                 arrowVisible = false;
              }
+         } else {
+             arrowVisible = false;
          }
          
     }
