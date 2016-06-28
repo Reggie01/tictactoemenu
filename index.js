@@ -8,7 +8,7 @@
                 draw = new Image(),
        gameover = new Image(),
               oicon = new Image(),
-       playagain = new Image(),
+       restart = new Image(),
          tictactoe = new Image(),
                xicon = new Image(),
              youwin = new Image(),
@@ -29,6 +29,13 @@
                   x: 60,
                   y: 160,
         },
+        {
+           name: "restart",
+           width: 150,
+           height: 40,
+           x: 0,
+           y: 80
+        }
     ]
     
     function loadImages() {
@@ -53,11 +60,12 @@
         youwin.src = "Images/youwin.png";
         draw.src = "Images/draw.png";
         gameover.src = "Images/gameover.png";
-        playagain.src = "Images/playagain.png";
+        restart.src = "Images/playagain.png";
     }
     
     function loadScene() { 
             loadImages();    
+           // loadArrow( 0, 170 );
     }
     
     function clear() {
@@ -104,8 +112,8 @@
     timerId = setInterval(update, 1000/frames);
     update();
     
-    function handleScene1( mouseX, mouseY ) {
-         var button = buttons.filter( function( button ) {
+    function filterButton( mouseX, mouseY ) {
+        var button = buttons.filter( function( button ) {
              if( mouseX >=  button.x &&
                  mouseX <= ( button.x + button.width ) &&
                  mouseY >= button.y &&
@@ -114,6 +122,12 @@
                  }
         });
         
+        return button;
+    }
+    
+    function handleScene1( mouseX, mouseY ) {
+         var button = filterButton( mouseX, mouseY );
+        
         if( button.length > 0 ) {
             if( button[0].name === "oicon" ) {
                 scene = 2;
@@ -121,7 +135,7 @@
                 scene = 2;
             }
         }  
-
+               
         console.log( "Button clicked: " + JSON.stringify( button, null, 2 ) );                
     }
     
@@ -130,24 +144,20 @@
         var num = Math.random();
         
         clear();
-        console.log( num );
         
+        context.drawImage( gameover, 0, 0 );
         if ( num > 0.66 ) {
-             context.drawImage( gameover, 0, 0 );
              context.drawImage( youwin, 0, 40 );
-             context.drawImage( playagain, 0, 80 );
              console.log( youwin );
         } else if ( num > 0.33 ) {
-             context.drawImage( gameover, 0, 0 );
              context.drawImage( computerwins, 0, 40 );
-             context.drawImage( playagain, 0, 80 );
              console.log( computerwins );
         } else {
-             context.drawImage( gameover, 0, 0 );
              context.drawImage( draw, 0, 40 );
-             context.drawImage( playagain, 0, 80 );
              console.log( draw );
         }
+        
+        context.drawImage( restart, 40, 80 );
                             
     }
     
@@ -158,8 +168,7 @@
     
     function handleScene3( mouseX, mouseY ) {
         if( mouseX > 0 && mouseX < 160 && mouseY > 80 && mouseY < 120 ) {
-            console.log( "Mouse x: " + mouseX );
-            console.log( "Mouse y: " + mouseY );
+            
         }
     }
     
@@ -187,6 +196,40 @@
         console.log( "Mouse Y: " + mouseY );        
     }
     
+    function loadArrow( x, y ) {
+        console.log( "loading arrow" );
+        arrow.onload = function() {
+            console.log( "arrow loaded" );
+            context.drawImage( arrow, x, y );
+        }
+    }
+    
+    function handleMouseMoveScene1( mouseX, mouseY ) {
+         var button = filterButton( mouseX, mouseY );
+         
+         if( button.length > 0 ) {
+            if( button[0].name === "oicon" ) {
+                context.drawImage( arrow, 0, 130 );
+                console.log( "oicon button" );
+            } else if( button[0].name === "xicon" ){
+                context.drawImage( arrow, 0, 170 );
+                console.log( "xicon button" );
+            } 
+         }
+    }
+    
+    function handleMouseMoveScene3( mouseX, mouseY ) {
+         
+         var button = filterButton( mouseX, mouseY );
+         
+         if( button.length > 0 ) {
+             if( button[0].name === "restart" ){
+                 console.log( "restart button" );
+             }
+         }
+         
+    }
+    
     function handleMouseMove( event ) {
         var mouseX, mouseY;
         
@@ -198,8 +241,12 @@
              mouseY = event.offsetY;
         }
         
-        console.log( "Mouse X: " + mouseX );
-        console.log( "Mouse Y: " + mouseY );
+        if( scene === 1 ) {
+            handleMouseMoveScene1( mouseX, mouseY );
+        } else if( scene === 3 ) {
+            handleMouseMoveScene3( mouseX, mouseY );
+        }
+        
     }
     
     canvas.addEventListener( "click", handleClick );
